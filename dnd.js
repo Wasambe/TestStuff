@@ -11,7 +11,7 @@ flatData = arrayinitialtreestrparsed;
 
 
 
-var flatDataORI = [
+var flatData = [
 {"name": "Top Level", "parent": null},
 {"name": "Level 2: A", "parent": "Top Level" },
 {"name": "Level 2: B", "parent": "Top Level" },
