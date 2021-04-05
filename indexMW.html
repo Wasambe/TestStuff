@@ -293,7 +293,7 @@ arraychanges = arrayd3fromnodesplusteststrparsed;
 //ORI works end
 
 
-savechangesyesno = 'yes';
+savechangesyesno = 'emergency';
 
 if (savechangesyesno == "yes"){
 //Test start 
@@ -329,7 +329,20 @@ myvarcircularstrparsed = JSON.parse(myvarcircularstr);
 datachaney = myvarcircularstrparsed;
 console.log(datachaney);
 
+}else if(savechangesyesno == 'emergency'){
+ // Retrieve the JSON string
+ arraychangesstr = localStorage.getItem("arrayaddallteststr");
+// Parse the JSON string back to JS object
+ arraychangesstrparsed = JSON.parse(arraychangesstr); //becomes arrayaddchildstrparsed[]
+	localStorage.setItem("arraychangesstr", JSON.stringify(arraychangesstrparsed));
+
+	console.log(arraychangesstrparsed);
+
+datachaney = arraychangesstrparsed;
+console.log(datachaney);
+
 }
+
 
 
 
