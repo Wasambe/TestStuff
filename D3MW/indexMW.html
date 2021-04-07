@@ -73,8 +73,9 @@ body {
                 &nbsp;
               </div>
               <div class="large-4 columns">
-                <a href="#" class="button info" onclick="close_rename_node_modal()">Cancel</a>
-                <a href="#" class="button success" onclick="rename_node()">Rename</a>
+                <!--  <a href="#" class="button info" onclick="close_rename_node_modal()">Cancel</a>   -->
+                <a href="#" class="button info" onclick="close_modal()">Cancel</a>
+				<a href="#" class="button success" onclick="rename_node()">Rename</a>
               </div>
             </div>
           </form>
@@ -96,7 +97,9 @@ body {
                 &nbsp;
               </div>
               <div class="large-4 columns">
-                <a href="#" class="button info" onclick="close_create_node_modal()">Cancel</a>
+               <!-- <a href="#" class="button info" onclick="close_create_node_modal()">Cancel</a> -->
+				<a href="#" class="button info" onclick="close_modal()">Cancel</a>
+                
                 <a href="#" class="button success" onclick="create_node()">Create</a>
               </div>
             </div>
@@ -270,9 +273,10 @@ var root = {
 };
 
 
+adminyesno = localStorage.getItem("adminyesno");
 
 
-savechangesyesno = 'setup';
+savechangesyesno = 'yes';
 
 if (savechangesyesno == "yes"){
 //Test start 
@@ -343,7 +347,14 @@ console.log(datachaney);
 //if savechangesyesno = 'no' I get No Root error because datachaney is hierarchy
  //if savechangesyesno = 'circular' I get No Root error because datachaney is hierarchy
  
- 
+ //https://github.com/d3/d3-hierarchy/issues/102
+ //d3.stratify and d3.hierarchy do the same thing: they return a root node. 
+ //The difference is that d3.hierarchy constructs a hierarchy (a root node) 
+ //from a hierarchical input data structure (typically derived from JSON), 
+ //whereas d3.stratify constructs a hierarchy from a tabular input data structure 
+ //(typically derived from CSV or TSV).
+  
+  
   var rootchaney = d3v6.stratify()
   .id(function(d) { return d.nameid; })
   .parentId(function(d) { return d.parentid; })
@@ -797,11 +808,6 @@ function update(source) {
     });
 	
 
-// Add a context menu
-      //  node.on('contextmenu', d3.contextMenu(menu));
-
-
-
     // Enter any new nodes at the parent's previous position.
     var nodeEnter = node.enter().append("g")
         .attr("class", "node")
@@ -820,10 +826,11 @@ function update(source) {
         .style("fill", function (d) {
         return d._children ? "lightsteelblue" : "#fff";
     })
-	.on('contextmenu', d3.contextMenu(menu));
-	 
+	if (adminyesno == "yes"){
+	nodeEnter.on('contextmenu', d3.contextMenu(menu));
+	 }
 
-//Ori start
+
     nodeEnter.append("text")
         .attr("x", rectW / 2)
         .attr("y", rectH / 2)
@@ -832,8 +839,10 @@ function update(source) {
         .text(function (d) {
         return d.name;
     })
-	.on('contextmenu', d3.contextMenu(menu));
-	//Ori end */
+	if (adminyesno == "yes"){
+	nodeEnter.on('contextmenu', d3.contextMenu(menu));
+	 }
+	
 	
 	
 	
@@ -1118,13 +1127,28 @@ function getXYPosition(e) {
     if (xyOn) {
 	
 	if (myMouseX < 30 && myMouseY < 30){
-        alert("X is " + myMouseX + "\nY is " + myMouseY);
+       // alert("X is " + myMouseX + "\nY is " + myMouseY);
+	   adminprompt();
 		}
     }
 }
 
 //
 document.onmouseup = getXYPosition;
+
+
+function adminprompt() {
+  var txt;
+  var adminyesno = prompt("Admin - Enter yes or no");
+  if (adminyesno == null || adminyesno == "") {
+    adminyesno = "User cancelled the prompt.";
+  } else {
+    adminyesno = adminyesno;
+	localStorage.setItem("adminyesno", adminyesno);
+	location.reload();
+  }
+  
+ }
 
 
 /*
