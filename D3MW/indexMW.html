@@ -351,10 +351,16 @@ console.log(datachaney);
  //(typically derived from CSV or TSV).
   
   
+   if (datachaney == ""){
+  datachaney = emergencydata;
+  }else{
+  datachaney = datachaney;
+  }
+  
   var rootchaney = d3v6.stratify()
   .id(function(d) { return d.nameid; })
   .parentId(function(d) { return d.parentid; })
-  (datachaney);
+ (datachaney);
   console.log (datachaney);
   console.log (rootchaney);
  root = rootchaney; 
