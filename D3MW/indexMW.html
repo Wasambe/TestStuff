@@ -490,6 +490,7 @@ var tree = d3.layout.tree().nodeSize([70, 40]);
 
     function delete_node(node) {
 	nodetodelete = node;
+	collapse(nodetodelete);
 	deleteoption(nodetodelete);
         visit(treeData, function(d) {
                if (d.children) {
