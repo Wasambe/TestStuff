@@ -280,7 +280,7 @@ datachaney = emergencydatastrparsed;
 datachaney = arraychangesstrparsed;
 }
 
-console.log(datachaney);
+//console.log(datachaney);
 
 if (emergencystartyesno == "yes"){
 //for emer 
@@ -321,8 +321,8 @@ arraychanges = arraychangesstrparsed;
   .id(function(d) { return d.nameid; })
   .parentId(function(d) { return d.parentid; })
  (datachaney);
-  console.log (datachaney);
-  console.log (rootchaney);
+  //console.log (datachaney);
+  //console.log (rootchaney);
  root = rootchaney; 
 //*/
  //End test
@@ -1190,7 +1190,21 @@ objIndex = arrayinitialtreestrparsed.findIndex((arrayinitialtreestrparsed => arr
 }
 
 
-//centerNode(root);
+centerNodeMW(root);
+ function centerNodeMW(source) {
+        scale = zoomListener.scale();
+        x = -source.y0;
+        y = -source.x0;
+       // x = x * scale + viewerWidth / 2;
+       // y = y * scale + viewerHeight / 2;
+	   x = 0;
+	   y = 0;
+        d3.select('g').transition()
+            .duration(duration)
+            .attr("transform", "translate(" + x + "," + y + ")scale(" + scale + ")");
+        zoomListener.scale(scale);
+        zoomListener.translate([x, y]);
+    }
 
 </script>
 
