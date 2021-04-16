@@ -735,9 +735,11 @@ console.log(rootglobal); //root contains everything you need
 			
 //https://stackoverflow.com/questions/55212239/how-to-export-save-updated-d3-js-v4-tree-json-data-string
 
-//I propose this solution that is not perfect and which deserves improvements but that works, it will help you get started.
+//I propose this solution that is not perfect and which deserves 
+//improvements but that works, it will help you get started.
 
-//All the code below is added at the end of the update function in the dndTree.js file.
+//All the code below is added at the end of the update function in 
+//the dndTree.js file.
 
 console.log(rootglobal); //root contains everything you need
     const getCircularReplacer = (deletePorperties) => { //func that allows a circular json to be stringified
