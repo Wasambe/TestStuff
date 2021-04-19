@@ -163,9 +163,12 @@ emergencystartyesno = localStorage.getItem("emergencystartyesno");
 	location.reload();
 		}
 	
-	
+	try {
 	if (treeData.parent == null && !treeData.children){
 	rootonlyyesno = 'yes';
+	}
+	}catch{
+	console.log ("Error");
 	}
 	
 	
