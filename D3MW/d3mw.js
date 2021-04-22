@@ -1,169 +1,4 @@
-<!-- 14 Apr 2021 Test using JSON only -->
-<!DOCTYPE html>
-<html>
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-
-
-  <link rel="stylesheet" href="foundation.css" />
-<link rel="stylesheet" href="app.css" />
-<link rel="stylesheet" href="d3-context-menu.css" />
-
-
-  <title>Wilson Family Tree Interactive</title>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
- 
- <script src="d3.v6.6.0.js"></script>
-    <script>
-        var d3v6 = window.d3;
-        window.d3 = null;
-    </script>
-  <script src="d3.v3.js"></script>
-
-       <script src="d3-context-menu.js"></script>
-      	   <script src="underscore-min.js"></script>
-        <script src="jquery.js"></script>
-        <script src="fastclick.js"></script>
-        <script src="foundation.min.js"></script>
-		<!-- <script src="d3mw.js"></script> -->
-		
-		
-		
-  <style id="compiled-css" type="text/css">
-      .node {
-    cursor: pointer;
-}
-.node circle {
-    fill: #fff;
-    stroke: steelblue;
-    stroke-width: 1.5px;
-}
-.node text {
-    font: 10px sans-serif;
-}
-.link {
-    fill: none;
-    stroke: #ccc;
-    stroke-width: 1.5px;
-}
-
-body {
-    overflow: hidden;
-}
-
-
-div.sticky {
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-  background-color: yellow;
-  padding: 10px;
-  font-size: 20px;
-  height: 50px;
- }
-
-.butsticky{
- background-color: red;
-}
-   
-  </style>
-
- <!-- <script id="insert"></script>  -->
-
-
-</head>
-<body>
-
-<dialog id="myDialog">This is a dialog window
-<form>
-    <ul id="checkBundle">
-        <li><label><input type="checkbox" />test1</label>
-        <li><label><input type="checkbox" />test2</label>
-        <li><label><input type="checkbox" />test3</label>
-        <li><label><input type="checkbox" />test4</label>
-     </ul>
-	 </form>
-<button id='butok'>OK</button>	 <button id='butcancel'>Cancel</button>	 
-</dialog>
-
-	 
-	 
-   <div id="body">
-<div class="sticky">
-<p style='float:left'>
-<button class='butadmin' id='admin' onclick='adminprompt()'>Admin</button>
-<button class='butsticky' id='expandAllbut' onclick='expandAll()'>Expand All</button>
-<button class='butsticky'id='collapseAllbut' onclick='collapseAll()'>Collapse All</button>
-</p>
-<p id='padmin' style='float:left'>
-<button class='butsticky'id='startoption' onclick='startoption()'>Start Option</button>
-<button class='butsticky'id='createnewtree' onclick='createnewtree()'>Create New Tree</button>
-<button class='butsticky'id='savetree' onclick='savetree()'>Save Tree</button>
-<button class='butsticky'id='opentree' onclick='opentree()'>Open Tree</button>
-<button class='butsticky' id='test' onclick='allStorage()'>Test</button>
-<button class='butsticky' id='modalstorage' onclick='allStorage()'>Modal Storage</button>
-<button id="myBtn" onclick='myFunction()'>Open Modal</button>
-</p>
-</div>
-    </div>
-	
-
-	
-	
-	 <div id="RenameNodeModal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-          <h2 id="modalTitle">Rename Node</h2>
-          <form id="RenameNodeForm">
-            <div class="row">
-              <div class="large-12 columns">
-                <label>Node name
-                  <input type="text" class="inputName" id='RenameNodeName' placeholder="node name" />
-                </label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="large-8 columns">
-                &nbsp;
-              </div>
-              <div class="large-4 columns">
-                <!--  <a href="#" class="button info" onclick="close_rename_node_modal()">Cancel</a>   -->
-                <a href="#" class="button info" onclick="close_modal()">Cancel</a>
-				<a href="#" class="button success" onclick="rename_node()">Rename</a>
-              </div>
-            </div>
-          </form>
-          <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        </div>
-
-        <div id="CreateNodeModal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-          <h2 id="modalTitle">Create Node</h2>
-          <form id="CreateNodeForm">
-            <div class="row">
-              <div class="large-12 columns">
-                <label>Node name
-                  <input type="text" class="inputName" id='CreateNodeName' placeholder="node name" />
-                </label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="large-8 columns">
-                &nbsp;
-              </div>
-              <div class="large-4 columns">
-               <!-- <a href="#" class="button info" onclick="close_create_node_modal()">Cancel</a> -->
-				<a href="#" class="button info" onclick="close_modal()">Cancel</a>
-                
-                <a href="#" class="button success" onclick="create_node()">Create</a>
-              </div>
-            </div>
-          </form>
-          <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        </div>
-	
-	<div id="tree-container"></div>
-
-  <!--  <script type="text/javascript">//<![CDATA[ -->
-	
-	<script>
+var body = document.getElementById('body');
 
 rootonlyyesno = 'no';
 		
@@ -202,27 +37,54 @@ var myrootemergency = {"data":{"name":"Chaney","nameid":1,"parentname":"","paren
 localStorage.setItem("myrootemergencystr", JSON.stringify(myrootemergency));
 localStorage.setItem("myjsonstr", JSON.stringify(myrootemergency));
 treeData = myrootemergency;
-}else if (startoptions == "New"){
-createnewtree();
+}else if (startoptions == "new"){
+//ORI createnewtree();
+var myrootemergency = [
+  {
+    "name": "Head Of Tree",
+    "parent": "null",
+    "children": [
+      {
+        "name": "Level 2: A",
+        "parent": "Top Level",
+        "children": [
+          {
+            "name": "Son of A",
+            "parent": "Level 2: A"
+          },
+          {
+            "name": "Daughter of A",
+            "parent": "Level 2: A"
+          }
+        ]
+      },
+      {
+        "name": "Level 2: B",
+        "parent": "Top Level"
+      }
+    ]
+  }
+];
+
+
+localStorage.setItem("myrootemergencystr", JSON.stringify(myrootemergency));
+localStorage.setItem("myjsonstr", JSON.stringify(myrootemergency));
+treeData = myrootemergency;
+
+
+
 }
 
 
 
 
+
+
  	var myjsonstr = localStorage.getItem("myjsonstr");
-	var myjsonobj = JSON.parse (myjsonstr);// load the external data
+	var myjsonobj = JSON.parse (myjsonstr);
 	treeData = myjsonobj;
 	
-	function opentree(){
-	localStorage.setItem("opentreeyesno", 'yes');
-	var opentreename = prompt("Enter Open Tree Name");
-	 opentreename = opentreename.toLowerCase();
-	var myjsonstr = localStorage.getItem("myjsonstr"+opentreename);
-	var myjsonobj = JSON.parse (myjsonstr);// load the external data
-	localStorage.setItem("myjsonstr", JSON.stringify(myjsonobj));
-	treeData = myjsonobj;
-	location.reload();
-		}
+	//opentree() was here
 	
 	try {
 	if (treeData.parent == null && !treeData.children){
@@ -1154,7 +1016,7 @@ function emergencyyesno() {
 
 function startoption() {
   var txt;
-  var startoptions = prompt("Start Options: New, Thomas, Wilson");
+  var startoptions = prompt("Demo Options: Thomas, Wilson");
   startoptions = startoptions.toLowerCase();
   if (startoptions == null || startoptions == "") {
     startoptions = "User cancelled the prompt.";
@@ -1468,7 +1330,7 @@ console.log(rootglobal); //root contains everything you need
  
  function allStorage() {
  //popup();
-var storageitems = [];
+var arraystorageitems = [];
     var values = [],
         keys = Object.keys(localStorage),
         i = keys.length;
@@ -1481,25 +1343,191 @@ var storageitems = [];
 		console.log (res);
 		if (res == ''){
 		}else{
-		storageitems.push(res);
+		arraystorageitems.push(res);
 		}
 		}
     }
-console.log (storageitems);
+console.log (arraystorageitems);
     return values;
 }
 
 
-function myFunction() { 
-  document.getElementById("myDialog").showModal(); 
+function openmodal() { 
+//HTML DOM insertAdjacentElement() Method
+mydia = document.getElementById("mydia");
+ var x = document.createElement("INPUT");
+  x.setAttribute("type", "checkbox");
+  mydia.appendChild(x);
+  document.getElementById("mydia").showModal(); 
 } 
-</script>
 
+function showDialog() {
+  x.show();
+}
+
+function closeDialog() {
+  x.close();
+}
+
+
+
+arraystorageitems = [];
+function opentree(){
+	localStorage.setItem("opentreeyesno", 'yes');
+	opentree1(); //put all storage items in arraystorageitems
+	opentree2(); //populate mydia with arraystorageitems
+		}
+	
+	function opentree1(){
+	// arraystorageitems = [];
+    var values = [],
+        keys = Object.keys(localStorage),
+        i = keys.length;
+
+    while ( i-- ) {
+	str = keys[i];
+	if (str.includes("myjson")){
+        values.push( localStorage.getItem(keys[i]) );
+		var res = str.substring(9);
+		console.log (res);
+		if (res == ''){
+		}else{
+			 res = res.toLowerCase();
+		arraystorageitems.push(res);
+		}
+		}
+    }
+	arraystorageitems.sort();
+	arraystorageitems.reverse();
+console.log (arraystorageitems);
+    return values;
+	}
+	
+	
+	function opentree2(){
+/*
+		var s = document.getElementById("mySpan");
+var h = document.getElementById("myH2");
+h.insertAdjacentElement("afterend", s);
+"afterbegin" - After the beginning of the element (as the first child)
+"afterend" - After the element
+"beforebegin" - Before the element
+"beforeend" - Before the end of the element (as the last child)
+*/
+
+document.getElementById("mydia").showModal();  
+ mydia = document.getElementById("mydia");
  
+ var i = 0;
+arraystorageitems.forEach (myarrayfunction);
+function myarrayfunction(value){
+//radio	
+  //<input type="radio" id="male" name="gender" value="male">
+  //<label for="male">Male</label><br>
+  var labelvar = document.createElement("label");
+   labelvar.setAttribute("id", "label"+i);
+   labelvar.setAttribute("name", "labelgroup");
+   var inputvar = document.createElement("input");
+   inputvar.setAttribute("type", "radio");
+   inputvar.setAttribute("id", "radio"+i);
+   inputvar.setAttribute("name", "radiogroup");
+   
+  
+   mydia.insertAdjacentElement("afterbegin", inputvar);
+    inputvar.insertAdjacentElement("afterend", labelvar);
+	labelvar.innerHTML = value;
+	
+		var mybreak = document.createElement('br');
+  inputvar.insertAdjacentElement("beforebegin", mybreak);
+	
+	i=i+1;
+	
+//checkbox	
+/*
+ var mylabel = document.createElement("LABEL");
+   var x = document.createElement("INPUT");
+  x.setAttribute("type", "checkbox");
 
- 
+  mydia.insertAdjacentElement("afterbegin", x);
+   x.insertAdjacentElement("afterend", mylabel);
+    mylabel.innerHTML = value;
+	
+	var mybreak = document.createElement('br');
+  x.insertAdjacentElement("beforebegin", mybreak);
+  */
+
+}
+  
+  
+ var butcancel = document.createElement('button');
+ butcancel.innerHTML = ('Cancel');
+  mydia.insertAdjacentElement("beforeend", butcancel);
+  
+  var butok = document.createElement('button');
+  butok.innerHTML = ('OK');
+  butcancel.insertAdjacentElement("beforebegin", butok);
+  
+/* not needed  
+    var pdia = document.createElement("p");
+mydia.insertAdjacentElement('afterbegin', pdia);
+pdia.innerHTML = ('Select Tree To Open');
+
+  var mybreak = document.createElement('br');
+  butok.insertAdjacentElement("beforebegin", mybreak);
+*/
+
+butok.addEventListener("click", opentreename);
+	}
+	
 
 
+		
+		function opentreename(){
+			/*
+			var opentreename = prompt("Enter Open Tree Name");
+	 opentreename = opentreename.toLowerCase();
+	var myjsonstr = localStorage.getItem("myjsonstr"+opentreename);
+	var myjsonobj = JSON.parse (myjsonstr);// load the external data
+	localStorage.setItem("myjsonstr", JSON.stringify(myjsonobj));
+	treeData = myjsonobj;
+	location.reload();
+	*/
 
-</body>
-</html>
+/*
+	https://stackoverflow.com/questions/9618504/how-to-get-the-selected-radio-button-s-value
+	var genderSRadio = document.querySelector("input[name=genderS]:checked");
+var genderSValue = genderSRadio ? genderSRadio.value : "";
+The code breaks down like this:
+
+Line 1: get a reference to the control that (a) is an <input> type, 
+(b) has a name attribute of genderS, and (c) is checked.
+Line 2: If there is such a control, return its value. If there isn't, 
+return an empty string. The genderSRadio variable is truthy if Line 1 
+finds the control and null/falsey if it doesn't.
+*/
+
+var mdia = document.getElementById("mydia");
+
+
+	var radioname = document.querySelector("input[name=radiogroup]:checked");
+var radioonoff = radioname ? radioname.value : "";
+
+
+var labels = document.getElementsByName('labelgroup');
+var radios = document.getElementsByName('radiogroup');
+var ele = document.getElementsByName('radiogroup');
+              
+            for(i = 0; i < ele.length; i++) {
+                if(ele[i].checked){
+				              console.log ("Tree Name: "+labels[i].innerText);
+							  opentreename = (labels[i].innerText);
+				}
+							              }
+										  
+			 // do stuff
+			 var myjsonstr = localStorage.getItem("myjsonstr"+opentreename);
+	var myjsonobj = JSON.parse (myjsonstr);// load the external data
+	localStorage.setItem("myjsonstr", JSON.stringify(myjsonobj));
+	treeData = myjsonobj;
+	location.reload();
+}		

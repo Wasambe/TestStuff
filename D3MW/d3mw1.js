@@ -1,169 +1,4 @@
-<!-- 14 Apr 2021 Test using JSON only -->
-<!DOCTYPE html>
-<html>
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-
-
-  <link rel="stylesheet" href="foundation.css" />
-<link rel="stylesheet" href="app.css" />
-<link rel="stylesheet" href="d3-context-menu.css" />
-
-
-  <title>Wilson Family Tree Interactive</title>
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
- 
- <script src="d3.v6.6.0.js"></script>
-    <script>
-        var d3v6 = window.d3;
-        window.d3 = null;
-    </script>
-  <script src="d3.v3.js"></script>
-
-       <script src="d3-context-menu.js"></script>
-      	   <script src="underscore-min.js"></script>
-        <script src="jquery.js"></script>
-        <script src="fastclick.js"></script>
-        <script src="foundation.min.js"></script>
-		<!-- <script src="d3mw.js"></script> -->
-		
-		
-		
-  <style id="compiled-css" type="text/css">
-      .node {
-    cursor: pointer;
-}
-.node circle {
-    fill: #fff;
-    stroke: steelblue;
-    stroke-width: 1.5px;
-}
-.node text {
-    font: 10px sans-serif;
-}
-.link {
-    fill: none;
-    stroke: #ccc;
-    stroke-width: 1.5px;
-}
-
-body {
-    overflow: hidden;
-}
-
-
-div.sticky {
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-  background-color: yellow;
-  padding: 10px;
-  font-size: 20px;
-  height: 50px;
- }
-
-.butsticky{
- background-color: red;
-}
-   
-  </style>
-
- <!-- <script id="insert"></script>  -->
-
-
-</head>
-<body>
-
-<dialog id="myDialog">This is a dialog window
-<form>
-    <ul id="checkBundle">
-        <li><label><input type="checkbox" />test1</label>
-        <li><label><input type="checkbox" />test2</label>
-        <li><label><input type="checkbox" />test3</label>
-        <li><label><input type="checkbox" />test4</label>
-     </ul>
-	 </form>
-<button id='butok'>OK</button>	 <button id='butcancel'>Cancel</button>	 
-</dialog>
-
-	 
-	 
-   <div id="body">
-<div class="sticky">
-<p style='float:left'>
-<button class='butadmin' id='admin' onclick='adminprompt()'>Admin</button>
-<button class='butsticky' id='expandAllbut' onclick='expandAll()'>Expand All</button>
-<button class='butsticky'id='collapseAllbut' onclick='collapseAll()'>Collapse All</button>
-</p>
-<p id='padmin' style='float:left'>
-<button class='butsticky'id='startoption' onclick='startoption()'>Start Option</button>
-<button class='butsticky'id='createnewtree' onclick='createnewtree()'>Create New Tree</button>
-<button class='butsticky'id='savetree' onclick='savetree()'>Save Tree</button>
-<button class='butsticky'id='opentree' onclick='opentree()'>Open Tree</button>
-<button class='butsticky' id='test' onclick='allStorage()'>Test</button>
-<button class='butsticky' id='modalstorage' onclick='allStorage()'>Modal Storage</button>
-<button id="myBtn" onclick='myFunction()'>Open Modal</button>
-</p>
-</div>
-    </div>
-	
-
-	
-	
-	 <div id="RenameNodeModal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-          <h2 id="modalTitle">Rename Node</h2>
-          <form id="RenameNodeForm">
-            <div class="row">
-              <div class="large-12 columns">
-                <label>Node name
-                  <input type="text" class="inputName" id='RenameNodeName' placeholder="node name" />
-                </label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="large-8 columns">
-                &nbsp;
-              </div>
-              <div class="large-4 columns">
-                <!--  <a href="#" class="button info" onclick="close_rename_node_modal()">Cancel</a>   -->
-                <a href="#" class="button info" onclick="close_modal()">Cancel</a>
-				<a href="#" class="button success" onclick="rename_node()">Rename</a>
-              </div>
-            </div>
-          </form>
-          <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        </div>
-
-        <div id="CreateNodeModal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-          <h2 id="modalTitle">Create Node</h2>
-          <form id="CreateNodeForm">
-            <div class="row">
-              <div class="large-12 columns">
-                <label>Node name
-                  <input type="text" class="inputName" id='CreateNodeName' placeholder="node name" />
-                </label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="large-8 columns">
-                &nbsp;
-              </div>
-              <div class="large-4 columns">
-               <!-- <a href="#" class="button info" onclick="close_create_node_modal()">Cancel</a> -->
-				<a href="#" class="button info" onclick="close_modal()">Cancel</a>
-                
-                <a href="#" class="button success" onclick="create_node()">Create</a>
-              </div>
-            </div>
-          </form>
-          <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        </div>
-	
-	<div id="tree-container"></div>
-
-  <!--  <script type="text/javascript">//<![CDATA[ -->
-	
-	<script>
+var body = document.getElementById('body');
 
 rootonlyyesno = 'no';
 		
@@ -210,19 +45,10 @@ createnewtree();
 
 
  	var myjsonstr = localStorage.getItem("myjsonstr");
-	var myjsonobj = JSON.parse (myjsonstr);// load the external data
+	var myjsonobj = JSON.parse (myjsonstr);
 	treeData = myjsonobj;
 	
-	function opentree(){
-	localStorage.setItem("opentreeyesno", 'yes');
-	var opentreename = prompt("Enter Open Tree Name");
-	 opentreename = opentreename.toLowerCase();
-	var myjsonstr = localStorage.getItem("myjsonstr"+opentreename);
-	var myjsonobj = JSON.parse (myjsonstr);// load the external data
-	localStorage.setItem("myjsonstr", JSON.stringify(myjsonobj));
-	treeData = myjsonobj;
-	location.reload();
-		}
+	//opentree() was here
 	
 	try {
 	if (treeData.parent == null && !treeData.children){
@@ -1468,7 +1294,7 @@ console.log(rootglobal); //root contains everything you need
  
  function allStorage() {
  //popup();
-var storageitems = [];
+var arraystorageitems = [];
     var values = [],
         keys = Object.keys(localStorage),
         i = keys.length;
@@ -1481,25 +1307,132 @@ var storageitems = [];
 		console.log (res);
 		if (res == ''){
 		}else{
-		storageitems.push(res);
+		arraystorageitems.push(res);
 		}
 		}
     }
-console.log (storageitems);
+console.log (arraystorageitems);
     return values;
 }
 
 
-function myFunction() { 
+function openmodal() { 
+//HTML DOM insertAdjacentElement() Method
+mydialog = document.getElementById("myDialog");
+ var x = document.createElement("INPUT");
+  x.setAttribute("type", "checkbox");
+  mydialog.appendChild(x);
   document.getElementById("myDialog").showModal(); 
 } 
-</script>
 
+function showDialog() {
+  x.show();
+}
+
+function closeDialog() {
+  x.close();
+}
+
+
+
+arraystorageitems = [];
+function opentree(){
+	localStorage.setItem("opentreeyesno", 'yes');
+	opentree1(); //put all storage items in arraystorageitems
+	opentree2(); //populate mydialog with arraystorageitems
+	opentree3(); //open selected tree
+	}
+	
+	function opentree1(){
+	// arraystorageitems = [];
+    var values = [],
+        keys = Object.keys(localStorage),
+        i = keys.length;
+
+    while ( i-- ) {
+	str = keys[i];
+	if (str.includes("myjson")){
+        values.push( localStorage.getItem(keys[i]) );
+		var res = str.substring(9);
+		console.log (res);
+		if (res == ''){
+		}else{
+			 res = res.toLowerCase();
+		arraystorageitems.push(res);
+		}
+		}
+    }
+	arraystorageitems.sort();
+	arraystorageitems.reverse();
+console.log (arraystorageitems);
+    return values;
+	}
+	
+	
+	function opentree2(){
+/*
+		var s = document.getElementById("mySpan");
+var h = document.getElementById("myH2");
+h.insertAdjacentElement("afterend", s);
+"afterbegin" - After the beginning of the element (as the first child)
+"afterend" - After the element
+"beforebegin" - Before the element
+"beforeend" - Before the end of the element (as the last child)
+*/
+//HTML DOM insertAdjacentElement() Method
+//var mydialog = document.getElementById("myDialog")
+ //var mycheckbox = document.createElement("INPUT");
+  //mycheckbox.setAttribute("type", "checkbox");
+  //mycheckbox.insertAdjacentElement("afterbegin", mydialog);
+ // mydialog.appendChild(x);
+// document.getElementById("myDialog").showModal(); 
+ //mydialog.showModal();
  
-
+document.getElementById("myDialog").showModal();  
+ mydialog = document.getElementById("myDialog");
  
+arraystorageitems.forEach (myarrayfunction);
+function myarrayfunction(value){
+ var mylabel = document.createElement("LABEL");
+   var x = document.createElement("INPUT");
+  x.setAttribute("type", "checkbox");
+
+  mydialog.insertAdjacentElement("afterbegin", x);
+   x.insertAdjacentElement("afterend", mylabel);
+    mylabel.innerHTML = value;
+	
+	var mybreak = document.createElement('br');
+  x.insertAdjacentElement("beforebegin", mybreak);
+
+}
+  
+  
+ var butcancel = document.createElement('button');
+ butcancel.innerHTML = ('Cancel');
+  mydialog.insertAdjacentElement("beforeend", butcancel);
+  
+  var butok = document.createElement('button');
+  butok.innerHTML = ('OK');
+  butcancel.insertAdjacentElement("beforebegin", butok);
+  
+    var pdia = document.createElement("p");
+mydialog.insertAdjacentElement('afterbegin', pdia);
+pdia.innerHTML = ('Select Tree To Open');
+
+  var mybreak = document.createElement('br');
+  butok.insertAdjacentElement("beforebegin", mybreak);
 
 
-
-</body>
-</html>
+	}
+	
+		
+		function opentree3(){
+			var opentreename = prompt("Enter Open Tree Name");
+	 opentreename = opentreename.toLowerCase();
+	var myjsonstr = localStorage.getItem("myjsonstr"+opentreename);
+	var myjsonobj = JSON.parse (myjsonstr);// load the external data
+	localStorage.setItem("myjsonstr", JSON.stringify(myjsonobj));
+	treeData = myjsonobj;
+	location.reload();
+		}
+		
