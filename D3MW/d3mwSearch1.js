@@ -523,6 +523,7 @@ function collapse(d) {
 }
 
 
+
  function expand(d) {
         if (d._children) {
             d.children = d._children;
@@ -1562,12 +1563,7 @@ function searchtree0(){
 
 
 function searchtree1(){
-	var svg = d3.select("#body").append("svg").attr("width", 1500).attr("height", 1000)
-    .call(zm = d3.behavior.zoom().scaleExtent([1,3]).on("zoom", redraw)).append("g")
-    .attr("transform", "translate(" + 350 + "," + 20 + ")");
-
-	var baseSvg = d3.select("#tree-container").append("svg");
-	var mw = svg.data;
+	
 	//var mw = d3.selectAll("g.node");
   //.filter(function(d) { return id === nameid; });	
 
@@ -1614,6 +1610,91 @@ if (name.includes (searchname)){
 function searchtree2(){
 d3.select(selectednodemw);
 }
+
+
+
+//Search1 starts here
+function SourceCache() {
+  var ks = [], vs =[];
+
+  function getValue(k) {
+    var idx = ks.indexOf(k);
+    if(idx !== -1) { 
+      return vs[idx]; 
+    }
+  }
+
+  function cache(source) {
+    var k = source.name;
+    if(source && !getValue(k)) { 
+      var idx = ks.length;
+      ks[idx] = k;
+      vs[idx] = source;
+    }
+  }  
+
+  function cacheUntilMatch(v, root) {
+    var m;
+    function recurse(source) {
+      cache(source);
+      if(m || !source) { 
+        return; 
+      } else if(source.name === v) { 
+        m = source;
+        return; 
+      } else if(source.children) {
+        source.children.forEach((d) => {
+          recurse(d);
+        });
+      }
+    }
+    recurse(root);
+	return m;
+  }  
+
+  return {getValue: getValue, cacheUntilMatch: cacheUntilMatch};
+}
+
+// this must be outside of the submit function to be reused across searches
+var cache = SourceCache();
+
+// We only cache nodes that have been visited. We stop caching as soon as a match has been found. 
+// If trees can be very deep and performance is critical, another strategy might be required. 
+
+function onSubmitFilter() {
+  //var v = document.getElementById('filterInput').value;
+  var v = prompt("Enter family member's first name");
+
+  if(v === '') {
+    filtered(root);
+  } else {
+    var m = cache.getValue(v);
+    if(!m) { m = cache.cacheUntilMatch(v, root); }
+    filtered(m);
+  }
+}
+
+function filtered(source) {
+  collapseSearch1(root);
+  update(root);
+  if(source && source._children) {
+    source.children = source._children;
+    source._children = null;
+  } 
+  update(source);
+}
+
+
+
+function collapseSearch1(d) {
+    if (d.children) {
+      d._children = d.children;
+      d.children = null;
+      d._children.forEach(collapseSearch1);
+    }
+  }
+
+//Search1 ends here
 
 
   

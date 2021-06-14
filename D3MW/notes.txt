@@ -1,3 +1,6 @@
 hier
 https://livebook.manning.com/concept/d3/hierarchical-object
 
+transition
+https://observablehq.com/@mprasse/week-12-interaction-and-animation-d3-transitions-behavior
+

@@ -1,17 +1,18 @@
 var body = document.getElementById('body');
 
 rootonlyyesno = 'no';
+searchtreeyesno = 'no';
 		
 adminyesno = localStorage.getItem("adminyesno");
 emergencystartyesno = localStorage.getItem("emergencystartyesno");
 
 
  if (adminyesno == "no") {
-   var padmin = document.getElementById('padmin');
-   padmin.style.display = 'none';
+   var padminyes = document.getElementById('padminyes');
+   padminyes.style.display = 'none';
 	}else{
-	var padmin = document.getElementById('padmin');
-   padmin.style.display = 'float:left';
+	var padminyes = document.getElementById('padminyes');
+   padminyes.style.display = 'float:left';
 	}
 
 opentreeyesno = '';
@@ -278,8 +279,8 @@ var tree = d3.layout.tree().nodeSize([70, 40]);
 
     function initiateDrag(d, domNode) {
         draggingNode = d;
-        d3.select(domNode).select('.ghostCircle').attr('pointer-events', 'none');
-        d3.selectAll('.ghostCircle').attr('class', 'ghostCircle show');
+        d3.select(domNode).select('.ghostRect').attr('pointer-events', 'none');
+        d3.selectAll('.ghostRect').attr('class', 'ghostRect show');
         d3.select(domNode).attr('class', 'node activeDrag');
 
         svgGroup.selectAll("g.node").sort(function(a, b) { // select the parent and sort the path's
@@ -412,10 +413,10 @@ var tree = d3.layout.tree().nodeSize([70, 40]);
 
     function endDrag() {
         selectedNode = null;
-        d3.selectAll('.ghostCircle').attr('class', 'ghostCircle');
+        d3.selectAll('.ghostRect').attr('class', 'ghostRect');
         d3.select(domNode).attr('class', 'node');
         // now restore the mouseover event or we won't be able to drag a 2nd time
-        d3.select(domNode).select('.ghostCircle').attr('pointer-events', '');
+        d3.select(domNode).select('.ghostRect').attr('pointer-events', '');
         updateTempConnector();
         if (draggingNode !== null) {
             update(root);
@@ -425,7 +426,7 @@ var tree = d3.layout.tree().nodeSize([70, 40]);
     }
 
  // color a node properly
-  function colorNode(d) {
+  function colorNodeORI(d) {
         result = "#fff";
         if (d.synthetic == true) {
           result = (d._children || d.children) ? "darkgray" : "lightgray";
@@ -436,10 +437,32 @@ var tree = d3.layout.tree().nodeSize([70, 40]);
           } else if (d.type == "Produce") {
             result = (d._children || d.children) ? "yellowgreen" : "yellow";
           } else if (d.type == "RecipeIngredient") {
-            result = (d._children || d.children) ? "skyblue" : "royalblue";
+            result = (d._children || d.children) ? "orange" : "orange";
           } else {
-            result = "lightsteelblue"
+            //ORI result = "lightsteelblue"
+			result = "orange";
           }
+        }
+        return result;
+    }
+	
+	
+	
+	 // color a node properly
+  function colorNode(d) {
+        result = "#fff";
+        if (d.class === "found") {
+            result = "#ff4136"; //red
+        } else if (d.type == "synthetic") {
+            result = (d._children || d.children) ? "darkgray" : "lightgray";
+        } else if (d.type == "person") {
+            result = (d._children || d.children) ? "royalblue" : "skyblue";
+        } else if (d.type == "two") {
+            result = (d._children || d.children) ? "orangered" : "orange";
+        } else if (d.type == "three") {
+            result = (d._children || d.children) ? "yellowgreen" : "yellow";
+        } else {
+            result = "lightsteelblue"
         }
         return result;
     }
@@ -492,6 +515,23 @@ var tree = d3.layout.tree().nodeSize([70, 40]);
 
 
 
+ function centerNodeMW(source) {
+        scale = zoomListener.scale();
+        x = -source.y0;
+        y = -source.x0;
+       // x = x * scale + viewerWidth / 2;
+       // y = y * scale + viewerHeight / 2;
+	   x = 150;
+	   y = 50;
+        d3.select('g').transition()
+            .duration(duration)
+            .attr("transform", "translate(" + x + "," + y + ")scale(" + scale + ")");
+        zoomListener.scale(scale);
+        zoomListener.translate([x, y]);
+    }
+	
+	
+
 var i = 0,
     duration = 750,
     rectW = 80,
@@ -514,6 +554,51 @@ zm.translate([350, 20]);
 root.x0 = 0;
 root.y0 = height / 2;
 
+
+
+
+function searchTree(d, first_call=false) {
+    if (d.children)
+        d.children.forEach(searchTree);
+    else if (d._children)
+        d._children.forEach(searchTree);
+    var searchFieldValue = eval(searchField);
+    if (searchFieldValue && searchFieldValue.match(searchText)) {
+        if (first_call) {
+            d.search_target = true;
+            console.log("Setting search_target: " + d.name)
+        } else {
+            d.search_target = false;
+        } 
+        // Walk parent chain
+        var ancestors = [];
+        var parent = d;
+		
+        while (typeof(parent) !== "undefined") {
+			try{
+            ancestors.push(parent);
+           // console.log(parent);
+            parent.class = "found";
+            parent = parent.parent;
+			}catch{
+			//console.log (parent);
+			break;
+			}
+        }
+        //console.log(ancestors);
+    }
+}
+
+function clearAll(d) {
+    d.class = "";
+    if (d.children)
+        d.children.forEach(clearAll);
+    else if (d._children)
+        d._children.forEach(clearAll);
+}
+
+
+
 function collapse(d) {
     if (d.children) {
         d._children = d.children;
@@ -521,6 +606,17 @@ function collapse(d) {
         d.children = null;
     }
 }
+
+
+function expandAllSearch(d) {
+    if (d._children) {
+        d.children = d._children;
+        d.children.forEach(expandAllSearch);
+        d._children = null;
+    } else if (d.children)
+        d.children.forEach(expandAllSearch);
+}
+
 
 
  function expand(d) {
@@ -536,16 +632,39 @@ if (rootonlyyesno == 'yes'){
 }else{
 root.children.forEach(collapse);
 }
-update(root);
+//duplicate update(root);
 
 d3.select("#body").style("height", "800px");
 
 
-//function update(source) starts here 544-698
+//function update(source) starts here
 function update(source) {
+	
+	 // function counts total children of root node and 
+	 //sets tree height accordingly.
+        // This prevents the layout looking squashed when 
+		//new nodes are made visible or looking sparse when 
+		//nodes are removed
+        // This makes the layout more consistent.
+		//I don't understan this childCount. Must Review
+        var levelWidth = [1];
+        var childCount = function(level, n) {
+
+            if (n.children && n.children.length > 0) {
+                if (levelWidth.length <= level + 1) levelWidth.push(0);
+
+                levelWidth[level + 1] += n.children.length;
+                n.children.forEach(function(d) {
+                    childCount(level + 1, d);
+                });
+            }
+        };
+        childCount(0, root);
+       
 
     // Compute the new tree layout.
-    var nodes = tree.nodes(root).reverse(),
+   // var nodes = tree.nodes(root).reverse(), don't need reverse
+   var nodes = tree.nodes(root),
         links = tree.links(nodes);
 		
 
@@ -570,22 +689,32 @@ function update(source) {
     })
         .on("click", click);
 		
-		
-
+			
     nodeEnter.append("rect")
+	.attr('class', 'nodeRect') 
         .attr("width", rectW)
         .attr("height", rectH)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
-        .style("fill", function (d) {
-        return d._children ? "lightsteelblue" : "#fff";
-    })
+		.style("fill", function(d) {
+                if (d.class === "found") {
+					   return "orange"; // 
+					  // return "#2E8B57"; // seagreen
+					                 }
+									  })
+		.style("stroke", function(d) {
+                if (d.class === "found") {
+					   return "orange"; // 
+					  // return "#2E8B57"; // seagreen
+					                 }
+            })
 	if (adminyesno == "yes"){
 	nodeEnter.on('contextmenu', d3.contextMenu(menu));
 	 }
+	 
+	
 
-
-    nodeEnter.append("text")
+ nodeEnter.append("text")
         .attr("x", rectW / 2)
         .attr("y", rectH / 2)
         .attr("dy", ".35em")
@@ -596,7 +725,14 @@ function update(source) {
 	if (adminyesno == "yes"){
 	nodeEnter.on('contextmenu', d3.contextMenu(menu));
 	 }
-	
+		
+		
+
+ nodeEnter.append("rect")
+            .attr('class', 'ghostRect')
+             .attr("opacity", 0.2) // change this to zero to hide the target area
+            .style("fill", "red");
+			 
 	
 	
 	
@@ -606,11 +742,17 @@ function update(source) {
             .text(function(d) {
                 return d.name;
             });
+			
+			
+			//Seems to color all nodes. Must review.
+			 // Change the circle fill depending on whether it has children and is collapsed
+        node.select("rect.nodeRect") //this colors the node red
+            //.attr("r", 4.5)
+            //.attr("r", 8)
+           .style("fill", colorNode); //this colors the node red
+			
 
-
-
-
-
+ 
     // Transition nodes to their new position.
     var nodeUpdate = node.transition()
         .duration(duration)
@@ -626,9 +768,36 @@ function update(source) {
         .style("fill", function (d) {
         return d._children ? "lightsteelblue" : "#fff";
     });
+	
+	
+	
+	 nodeUpdate.select("rect")
+	.attr('class', 'nodeRect') 
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+		.style("fill", function(d) {
+                if (d.class === "found") {
+					   return "orange"; // 
+					  // return "#2E8B57"; // seagreen
+					                 }
+									  })
+		.style("stroke", function(d) {
+                if (d.class === "found") {
+					   return "orange"; // 
+					  // return "#2E8B57"; // seagreen
+					                 }
+            })
+	if (adminyesno == "yes"){
+	nodeEnter.on('contextmenu', d3.contextMenu(menu));
+	 }
+	 
 
     nodeUpdate.select("text")
         .style("fill-opacity", 1);
+		//.style("fill', 'black');
+		
+
+		
 
     // Transition exiting nodes to the parent's new position.
     var nodeExit = node.exit().transition()
@@ -637,16 +806,24 @@ function update(source) {
         return "translate(" + source.x + "," + source.y + ")";
     })
         .remove();
-
-    nodeExit.select("rect")
+		
+		/* ORI
+		    nodeExit.select("rect")
         .attr("width", rectW)
         .attr("height", rectH)
     //.attr("width", bbox.getBBox().width)""
     //.attr("height", bbox.getBBox().height)
     .attr("stroke", "black")
         .attr("stroke-width", 1);
+		*/
+		
+		nodeExit.select("rect")
+		 .attr("r", 0);
 
-    nodeExit.select("text");
+    nodeExit.select("text")
+	 .style("fill-opacity", 0);
+	
+	
 
     // Update the links…
     var link = svg.selectAll("path.link")
@@ -673,7 +850,13 @@ function update(source) {
     // Transition links to their new position.
     link.transition()
         .duration(duration)
-        .attr("d", diagonal);
+        .attr("d", diagonal)
+		.style("stroke", function(d) {
+                    if (d.target.class === "found") {
+						return "orange"; 
+                        //ORI return "#2E8B57"; // seagreen
+                    }
+                });
 
     // Transition exiting nodes to the parent's new position.
     link.exit().transition()
@@ -696,10 +879,12 @@ function update(source) {
         d.y0 = d.y;
     });
 }
-//function update(source) ends here 544-698
+//function update(source) ends here
 
 
 outer_update = update;
+
+outer_centerNode = centerNode;
 
  // Append a group which holds all nodes and which the zoom Listener can act upon.
     var svgGroup = baseSvg.append("g");
@@ -712,10 +897,13 @@ outer_update = update;
     // Layout the tree initially and center on the root node.
     update(root);
     centerNode(root);
+	if (searchtreeyesno == 'yes'){
+		searchtreeyesno == 'no'
+	centerNodeMW(root);
+	}
     tree_root = root;
 	//Get initial tree obj so I can reload if user does not
 	//want to accept changes
-	
 	rootglobal = root;
 	
 	
@@ -974,8 +1162,8 @@ function getXYPositionClick(e) {
 	
 	if (myMouseX < 30 && myMouseY < 30){
        // alert("X is " + myMouseX + "\nY is " + myMouseY);
-	   adminprompt();
-	   emergencyyesno();
+	  // adminprompt();
+	  // emergencyyesno();
 	   location.reload();
 	   //var modal = document.getElementById("myModal");
 	   // modal.style.display = "block";
@@ -994,20 +1182,20 @@ function adminprompt() {
   if (adminyesno == '1234') {
     adminyesno = 'yes';
 	localStorage.setItem("adminyesno", adminyesno);
-	var padmin = document.getElementById('padmin');
-	padmin.style.display = 'float:left';
+	var padminyes = document.getElementById('padminyes');
+	padminyes.style.display = 'float:left';
 	location.reload();
   }else if (adminyesno == null || adminyesno == "") {
     adminyesno = "no";
 	localStorage.setItem("adminyesno", adminyesno);
-	var padmin = document.getElementById('padmin');
-	padmin.style.display = 'none';
+	var padminyes = document.getElementById('padminyes');
+	padminyes.style.display = 'none';
 	location.reload();
   }else{
   adminyesno = "no";
 	localStorage.setItem("adminyesno", adminyesno);
-	var padmin = document.getElementById('padmin');
-	padmin.style.display = 'none';
+	var padminyes = document.getElementById('padminyes');
+	padminyes.style.display = 'none';
 	location.reload();
   }
   
@@ -1087,6 +1275,49 @@ function collapseAll(){
 }
 
 
+
+function collapseAllNotFound(d) {
+    if (d.children) {
+        if (d.class !== "found") {
+            d._children = d.children;
+            d._children.forEach(collapseAllNotFound);
+            d.children = null;
+        } else {
+            d.children.forEach(collapseAllNotFound);
+        }
+    }
+}
+
+
+function blinkSearchTarget(d) {
+     if (d.search_target) {
+        outer_centerNode(d);
+        console.log("Found search target: " + d.name);
+    }
+    if (d.children) {
+        d.children.forEach(blinkSearchTarget);
+    }
+	
+	
+	if (d.search_target) {
+                        return "#2E8B57"; // seagreen
+                    }
+	
+   }
+
+
+
+function centerSearchTarget(d) {
+    if (d.search_target) {
+        outer_centerNode(d);
+        console.log("Found search target: " + d.name);
+    }
+    if (d.children) {
+        d.children.forEach(centerSearchTarget);
+    }
+}
+
+
 function iterateall(){
 arrayinitialtree = [];
 //console.log ("this is iterateall");
@@ -1128,23 +1359,6 @@ objIndex = arrayinitialtreestrparsed.findIndex((arrayinitialtreestrparsed => arr
 }
 
 
-centerNodeMW(root);
- function centerNodeMW(source) {
-        scale = zoomListener.scale();
-        x = -source.y0;
-        y = -source.x0;
-       // x = x * scale + viewerWidth / 2;
-       // y = y * scale + viewerHeight / 2;
-	   x = 150;
-	   y = 50;
-        d3.select('g').transition()
-            .duration(duration)
-            .attr("transform", "translate(" + x + "," + y + ")scale(" + scale + ")");
-        zoomListener.scale(scale);
-        zoomListener.translate([x, y]);
-    }
-	
-	
 	
 	
 	
@@ -1490,7 +1704,7 @@ pdia.innerHTML = ('Select Tree To Open');
   butok.insertAdjacentElement("beforebegin", mybreak);
 */
 
-butok.addEventListener("click", opentreename);
+butok.addEventListener("click", opentreename());
 	}
 	
 
@@ -1546,75 +1760,56 @@ var ele = document.getElementsByName('radiogroup');
 	location.reload();
 }		
 
-function searchtree(){
-		//expandAll();
-	//searchtree0();
-	//return;
-		searchtree1();
-		return;
-	//searchtree2();
+
+
+
+function colorsearchmatch(){
+	
+	
+			//Seems to color all nodes. Must review.
+			     //svg.selectAll("rect.nodeRect")
+                    //.style("fill", 'orange');
+			
+	
+//var nodes = tree.nodes(root),
+ //       links = tree.links(nodes);
+// var node = svg.selectAll("g.node")
+ svg.selectAll("rect.nodeRect")
+		.style("fill", 'orange')
+		.style("fill", function(d) {
+                if (d.class === "found") {
+					return "orange"; // 
+					       //ORI return "#2E8B57"; // seagreen
+					                 }
+            });
+	
 }
 
 
-function searchtree0(){
-	//expandAll();
-  }
-
-
-function searchtree1(){
-	var svg = d3.select("#body").append("svg").attr("width", 1500).attr("height", 1000)
-    .call(zm = d3.behavior.zoom().scaleExtent([1,3]).on("zoom", redraw)).append("g")
-    .attr("transform", "translate(" + 350 + "," + 20 + ")");
-
-	var baseSvg = d3.select("#tree-container").append("svg");
-	var mw = svg.data;
-	//var mw = d3.selectAll("g.node");
-  //.filter(function(d) { return id === nameid; });	
-
-
-var searchname = prompt("Enter family member's first name");
-	searchname = searchname.toLowerCase();
+ 
+	
+	function searchtreeprompt(){
+	searchtreeyesno = 'yes';
+	var searchname = prompt("Enter family member's first name");
+	//searchname = searchname.toLowerCase();
+	//searchname = 'Lucy';
 	console.log (searchname);
-	
-	
-	
-//expandAll();		
-	 d3.selectAll('g.node')  //here's how you get all the nodes
-    .each(function(d) {
-      //console.log (d.data.nameid + " " + d.data.name + " " + d.data.parentid + " " + d.data.parentname);
-      
-	  var name = d.data.name;
-	  name = name.toLowerCase();
-var nameid = d.data.nameid;
-//console.log (nameid);
-var parentname = d.data.parentname;
-var parentid = d.data.parentid;
-	var sel = d3.select('body', 'body');
-	//sel.style('background-color', 'white');
-	
-
-if (name.includes (searchname)){
-	var classmw = d3.select ('class', 'sticky')
-	classmw
-	.style('background-color', 'orange');
-
-	//console.log (name + "   " + searchname);
-	d3.select('g.node')
-	.style('fill', 'orange');
-	//update(root);	
-	return;
-		}else{
-			console.log ("no match");
-		}
-	
-	});	
-	}
-
-
-function searchtree2(){
-d3.select(selectednodemw);
+	                    clearAll(tree_root);
+                        expandAllSearch(tree_root);
+                        outer_update(tree_root);
+						searchField = "d.name";
+                        searchText = searchname;
+						firstCall = true;
+                        searchTree(tree_root, firstCall);
+                        tree_root.children.forEach(collapseAllNotFound);
+                        outer_update(tree_root);
+                        tree_root.children.forEach(centerSearchTarget);
+						//tree_root.children.forEach(blinkSearchTarget);
+						//colorsearchmatch();
+						//searchtreeyesno = 'no';
+						
 }
 
 
-  
+		
   

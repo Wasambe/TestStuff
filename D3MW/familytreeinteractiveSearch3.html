@@ -28,22 +28,33 @@
 		
 		
 		
+		
   <style id="compiled-css" type="text/css">
+  
+<!--
+The style section initially sets style features.
+@ runtime features are changed or updated thru js file.
+fill gives color to the particular element
+stroke sets the color of the border around that element
+stroke-width sets the thickness of that border.
+-->  
       .node {
     cursor: pointer;
 }
-.node circle {
-    fill: #fff;
-    stroke: steelblue;
-    stroke-width: 1.5px;
-}
+.node rect {
+    fill: purple;
+    stroke: orange;
+    stroke-width: 3.5px;
+	}
+	
 .node text {
     font: 10px sans-serif;
+	fill: black;
 }
 .link {
     fill: none;
-    stroke: #ccc;
-    stroke-width: 1.5px;
+    stroke: black;
+    stroke-width: .5px;
 }
 
 body {
@@ -65,6 +76,11 @@ div.sticky {
 .butsticky{
  background-color: red;
 }
+
+.butadminno{
+background-color: purple;
+
+}
    
   </style>
 
@@ -82,16 +98,16 @@ div.sticky {
 	 
    <div id="body">
 <div class="sticky">
-<p style='float:left'>
-<button class='butadmin' id='admin' onclick='adminprompt()'>Admin</button>
-<button class='butsticky' id='expandAllbut' onclick='expandAll()'>Expand All</button>
-<button class='butsticky'id='collapseAllbut' onclick='collapseAll()'>Collapse All</button>
+<p id='padminno' style='float:left'>
+<button class='butadminno' id='admin' onclick='adminprompt()'>Admin</button>
+<button class='butadminno' id='expandAllbut' onclick='expandAll()'>Expand All</button>
+<button class='butadminno'id='collapseAllbut' onclick='collapseAll()'>Collapse All</button>
+<button class='butadminno'id='idsearchtree' onclick='searchtreeprompt()'>Search Tree</button>
 </p>
-<p id='padmin' style='float:left'>
-<button class='butsticky'id='savetree' onclick='savetree()'>Save Tree</button>
-<button class='butsticky'id='opentree' onclick='opentree()'>Open Tree</button>
-<button class='butsticky'id='startoption' onclick='startoption()'>Demo Tree</button>
-<button class='butsearchtree'id='searchtree' onclick='searchtree()'>Search Tree</button>
+<p id='padminyes' style='float:left'>
+<button class='butadminyes'id='savetree' onclick='savetree()'>Save Tree</button>
+<button class='butadminyes'id='opentree' onclick='opentree()'>Open Tree</button>
+<button class='butadminyes'id='startoption' onclick='startoption()'>Demo Tree</button>
 
 
 <!--
@@ -161,8 +177,11 @@ div.sticky {
 	<div id="tree-container"></div>
 	
 	
-	<script src="d3mw.js"></script>
-		
+	<script src="dndSearch3.js"></script>
+	<!--<script src="d3mwSearch3.js"></script>-->
+	
+	
+	
 
 </body>
 </html>

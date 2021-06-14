@@ -1,97 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body {font-family: Arial, Helvetica, sans-serif;}
+  <meta charset="UTF-8">
+  <title>Title</title>
 
-/* The Modal (background) */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
+  <style>
+    svg {
+      background-color: #444455;
+    }
+    circle {
+      fill: #339933;
+      stroke: #ffffff;
+    }
+  </style>
 
-/* Modal Content */
-.modal-content {
-  background-color: #fefefe;
-  margin: auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-}
-
-/* The Close Button */
-.close {
-  color: #aaaaaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-}
-</style>
+  <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
 </head>
+
 <body>
+</body>
 
-<h2>Modal Example</h2>
+<script type="text/javascript">
 
-<!-- Trigger/Open The Modal -->
-<button id="myBtn">Open Modal</button>
+  var data = [
+    {"x": 50, "y": 50, "pulse": false},
+    {"x": 150, "y": 50, "pulse": false},
+    {"x": 100, "y": 150, "pulse": false}
+  ];
 
-<!-- The Modal -->
-<div id="myModal" class="modal">
+  var svg = d3.select("body")
+    .append("svg")
+    .attr("width", 200)
+    .attr("height", 200);
 
-  <!-- Modal content -->
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <p>Some text in the Modal..</p>
-  </div>
+  var plot_area = svg
+    .append("g")
+    .attr("id", "plot-area")
+    .attr("transform", "translate(0, 0)");
 
-</div>
+  var circles = plot_area.selectAll("circle").data(data);
 
-<script>
-// Get the modal
-var modal = document.getElementById("myModal");
+  circles.enter()
+    .append("circle")
+    .attr("r", 8)
+    .attr("cx", function(d) { return d.x; })
+    .attr("cy", function(d) { return d.y; })
+    .attr("stroke-width", 2);
 
-// Get the button that opens the modal
-var btn = document.getElementById("myBtn");
+  plot_area.selectAll("circle")
+    .on("click", function(d) {
+      d.pulse = !d.pulse;
+      if (d.pulse) {
+        var selected_circles = d3.select(this);
+        pulsate(selected_circles);
 
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
+      }
+    });
 
-// When the user clicks the button, open the modal 
-btn.onclick = function() {
-  modal.style.display = "block";
-  modal.style.display = "inline";
-  modal.style.display = "contents";
-}
+  function pulsate(selection) {
+    recursive_transitions();
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
+    function recursive_transitions() {
+      if (selection.data()[0].pulse) {
+        selection.transition()
+            .duration(400)
+            .attr("stroke-width", 2)
+            .attr("r", 8)
+            .ease('sin-in')
+            .transition()
+            .duration(800)
+            .attr('stroke-width', 3)
+            .attr("r", 12)
+            .ease('bounce-in')
+            .each("end", recursive_transitions);
+      } else {
+        // transition back to normal
+        selection.transition()
+            .duration(200)
+            .attr("r", 8)
+            .attr("stroke-width", 2)
+            .attr("stroke-dasharray", "1, 0");
+      }
+    }
   }
-}
+
 </script>
 
-</body>
 </html>
